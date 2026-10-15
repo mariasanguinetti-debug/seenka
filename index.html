@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Jeeves — Propuesta · Seenka</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #C9A84C; --gold-light: #E8C96A; --gold-pale: #FDF3D7;
+      --dark: #0A0A0A; --dark2: #141414; --dark3: #1E1E1E; --dark4: #2A2A2A;
+      --gray: #6B7280; --gray-light: #9CA3AF;
+      --white: #FFFFFF; --off-white: #F9F9F7;
+      --border: rgba(255,255,255,0.08);
+      --kd-blue: #2E6BFF;
+      --radius: 16px; --radius-sm: 10px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Helvetica, Arial, sans-serif;
+      background: var(--off-white); color: #111; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    h1 { font-size: clamp(2.2rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; }
+    h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.025em; }
+    h3 { font-size: 1.25rem; font-weight: 700; }
+    h4 { font-size: 1rem; font-weight: 600; }
+    p { color: #444; }
+    em { font-style: normal; color: var(--gold); }
+
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid #E5E7EB; padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between; height: 64px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 1rem; }
+    .nav-brand .jeeves-logo {
+      font-size: 1.3rem; font-weight: 900; letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #0A0A0A 0%, #444 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-divider { width: 1px; height: 24px; background: #D1D5DB; }
+    .nav-client { font-size: 0.85rem; font-weight: 700; color: var(--kd-blue); letter-spacing: 0.02em; }
+    .nav-links { display: flex; gap: 0.5rem; }
+    .nav-links a { font-size: 0.8rem; font-weight: 500; color: #555; text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; transition: all 0.2s; }
+    .nav-links a:hover { background: #F3F4F6; color: #111; }
+    .nav-cta { background: var(--dark); color: var(--white); font-size: 0.82rem; font-weight: 600; padding: 0.5rem 1.1rem; border-radius: 8px; text-decoration: none; transition: background 0.2s; }
+    .nav-cta:hover { background: #333; }
+
+    .section { padding: 6rem 2rem; }
+    .section.dark { background: var(--dark); color: var(--white); }
+    .section.dark p { color: var(--gray-light); }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .section-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      background: rgba(201,168,76,0.12); color: var(--gold); border: 1px solid rgba(201,168,76,0.3);
+      padding: 0.35rem 0.85rem; border-radius: 999px; margin-bottom: 1.25rem;
+    }
+    .section-badge.light { background: rgba(201,168,76,0.08); color: #8A6D2B; }
+
+    #sec-hero { background: var(--dark); padding: 6rem 2rem 5rem; color: var(--white); position: relative; overflow: hidden; }
+    #sec-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 80% 50%, rgba(201,168,76,0.12) 0%, transparent 70%); pointer-events: none; }
+    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+    .hero-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 1rem; }
+    .hero-title { color: var(--white); margin-bottom: 1.25rem; }
+    .hero-subtitle { font-size: 1.1rem; color: #9CA3AF; margin-bottom: 2.5rem; line-height: 1.7; }
+    .hero-stats { display: flex; gap: 2rem; margin-top: 2.5rem; flex-wrap: wrap; }
+    .hero-stat .num { font-size: 2rem; font-weight: 900; color: var(--gold); letter-spacing: -0.03em; }
+    .hero-stat .lbl { font-size: 0.75rem; color: #6B7280; font-weight: 500; margin-top: 0.15rem; }
+    .hero-cta-group { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .btn-primary { background: var(--gold); color: var(--dark); font-weight: 700; font-size: 0.9rem; padding: 0.85rem 1.8rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; display: inline-block; letter-spacing: -0.01em; }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .btn-ghost { color: var(--gray-light); font-weight: 500; font-size: 0.9rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: color 0.2s; }
+    .btn-ghost:hover { color: var(--white); }
+
+    .hero-visual { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+    .jcard {
+      width: 100%; max-width: 470px; aspect-ratio: 1.586; border-radius: 24px; padding: 1.9rem 2.1rem;
+      background: linear-gradient(125deg, #0D0D0D 0%, #1B1B1B 48%, #2B2412 100%);
+      border: 1px solid rgba(201,168,76,0.35);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.03) inset;
+      position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;
+      transform: rotate(-2.5deg);
+    }
+    .jcard::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 70% at 82% 12%, rgba(201,168,76,0.22) 0%, transparent 65%); pointer-events: none; }
+    .jcard::after { content: ''; position: absolute; top: -60%; left: -20%; width: 55%; height: 220%; background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.045) 45%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.045) 55%, transparent 100%); transform: rotate(12deg); pointer-events: none; }
+    .jcard-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .jcard-logo { font-size: 1.45rem; font-weight: 900; letter-spacing: -0.04em; color: var(--white); }
+    .jcard-elite {
+      font-size: 0.68rem; font-weight: 800; letter-spacing: 0.22em; text-transform: uppercase;
+      background: linear-gradient(135deg, var(--gold) 0%, #E8C96A 55%, #A9863A 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      border: 1px solid rgba(201,168,76,0.45); padding: 0.32rem 0.8rem; border-radius: 999px;
+    }
+    .jcard-mid { display: flex; align-items: center; gap: 1rem; }
+    .jcard-chip { width: 48px; height: 36px; border-radius: 7px; background: linear-gradient(135deg, #E8C96A 0%, #C9A84C 45%, #9A7B32 100%); position: relative; flex-shrink: 0; }
+    .jcard-chip::before { content: ''; position: absolute; inset: 6px; border: 1px solid rgba(60,45,10,0.55); border-radius: 4px; }
+    .jcard-chip::after { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(60,45,10,0.55); }
+    .jcard-wave { font-size: 1.2rem; color: rgba(255,255,255,0.55); transform: rotate(90deg); }
+    .jcard-number { font-size: clamp(1.05rem, 2.2vw, 1.35rem); font-weight: 600; color: #E5E7EB; letter-spacing: 0.14em; font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px rgba(0,0,0,0.6); }
+    .jcard-bottom { display: flex; justify-content: space-between; align-items: flex-end; }
+    .jcard-holder .lbl, .jcard-exp .lbl { font-size: 0.55rem; letter-spacing: 0.18em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.2rem; }
+    .jcard-holder .val { font-size: 0.95rem; font-weight: 700; color: var(--white); letter-spacing: 0.08em; text-transform: uppercase; }
+    .jcard-exp .val { font-size: 0.85rem; font-weight: 600; color: #D1D5DB; letter-spacing: 0.08em; }
+    .jcard-visa { font-size: 1.5rem; font-weight: 900; font-style: italic; letter-spacing: -0.02em; color: var(--white); }
+    .jcard-caption { font-size: 0.78rem; color: #6B7280; text-align: center; }
+    .jcard-caption strong { color: var(--gold); font-weight: 700; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+
+    .feat-card { background: var(--dark3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; }
+    .feat-card-light { background: var(--white); border: 1px solid #E5E7EB; border-radius: var(--radius); padding: 1.75rem; }
+    .feat-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .feat-card h4 { font-size: 1rem; font-weight: 700; color: var(--white); margin-bottom: 0.5rem; }
+    .feat-card p { font-size: 0.85rem; line-height: 1.65; }
+    .feat-card-light h4 { font-size: 1rem; font-weight: 700; color: #111; margin-bottom: 0.5rem; }
+    .feat-card-light p { font-size: 0.85rem; line-height: 1.65; color: #555; }
+
+    .sec-header { margin-bottom: 3rem; }
+    .sec-header p { font-size: 1.05rem; margin-top: 0.75rem; max-width: 680px; }
+    .sec-header.center { text-align: center; }
+    .sec-header.center p { margin-left: auto; margin-right: auto; }
+
+    /* Pricing table */
+    .price-table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); overflow: hidden; border: 1px solid #E5E7EB; }
+    .price-table th { padding: 1rem 1.25rem; text-align: left; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray); background: #F9FAFB; border-bottom: 1px solid #E5E7EB; }
+    .price-table td { padding: 1rem 1.25rem; font-size: 0.9rem; border-bottom: 1px solid #F3F4F6; vertical-align: middle; }
+    .price-table tr:last-child td { border-bottom: none; }
+    .price-table .strike { color: #9CA3AF; text-decoration: line-through; }
+    .price-table .free { color: #059669; font-weight: 800; }
+    .price-table .note { font-size: 0.78rem; color: var(--gray); }
+
+    /* Compare table (dark) */
+    .compare-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    .compare-table th { padding: 1rem 1.25rem; text-align: left; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: #9CA3AF; border-bottom: 1px solid var(--border); }
+    .compare-table td { padding: 1rem 1.25rem; font-size: 0.88rem; color: #D1D5DB; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+    .compare-table .col-jeeves { background: rgba(201,168,76,0.06); }
+    .compare-table th.col-jeeves { color: var(--gold); }
+    .check { color: #34D399; }
+    .cross { color: #F87171; }
+
+    /* Rails */
+    .rail-card { background: var(--dark3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; }
+    .rail-card .flag { font-size: 2.2rem; }
+    .rail-card h4 { color: var(--white); margin-top: 0.5rem; }
+    .rail-card .cur { font-size: 0.8rem; color: var(--gold); font-weight: 700; margin-top: 0.25rem; }
+    .rail-card p { font-size: 0.78rem; margin-top: 0.5rem; }
+
+    /* Calculator */
+    .calc-wrapper { background: var(--white); border-radius: 20px; border: 1px solid #E5E7EB; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+    .calc-header { background: var(--dark); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .calc-header h3 { color: var(--white); font-size: 1rem; }
+    .calc-header .badge { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; background: rgba(201,168,76,0.2); color: var(--gold); border: 1px solid rgba(201,168,76,0.4); padding: 0.25rem 0.65rem; border-radius: 999px; }
+    .calc-body { padding: 2rem; }
+    .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .calc-section-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #E5E7EB; }
+    .calc-field { margin-bottom: 1.25rem; }
+    .calc-field label { font-size: 0.82rem; font-weight: 600; color: #374151; display: block; margin-bottom: 0.4rem; }
+    .calc-field .hint { font-size: 0.72rem; color: var(--gray); margin-top: 0.25rem; }
+    .calc-input-wrap { position: relative; }
+    .calc-input-wrap .prefix { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.85rem; font-weight: 600; color: var(--gray); }
+    .calc-input-wrap .suffix { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: var(--gray); }
+    input[type="number"] { width: 100%; padding: 0.65rem 0.9rem; border: 1.5px solid #E5E7EB; border-radius: 8px; font-size: 0.9rem; font-family: inherit; background: #FAFAFA; color: #111; transition: border-color 0.2s; -moz-appearance: textfield; }
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus { outline: none; border-color: var(--gold); background: #fff; }
+    .has-prefix input { padding-left: 2rem; }
+    .has-suffix input { padding-right: 4.5rem; }
+    .editable { background: #FFFBEF !important; border-color: #E8C96A !important; }
+    .calc-results { background: var(--dark); border-radius: 14px; padding: 1.75rem; }
+    .calc-results h4 { color: var(--white); margin-bottom: 1.25rem; font-size: 0.95rem; }
+    .result-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .result-row:last-child { border-bottom: none; }
+    .result-label { font-size: 0.82rem; color: #9CA3AF; }
+    .result-value { font-size: 0.9rem; font-weight: 700; color: var(--white); white-space: nowrap; }
+    .result-row.highlight { background: rgba(201,168,76,0.08); margin: 0 -1rem; padding: 0.75rem 1rem; border-radius: 8px; }
+    .result-row.highlight .result-label { color: var(--gold); font-weight: 600; }
+    .result-row.highlight .result-value { color: var(--gold); font-size: 1.15rem; }
+
+    /* Flow */
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; position: relative; }
+    .flow::before { content: ''; position: absolute; top: 28px; left: 12.5%; right: 12.5%; height: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+    .flow-step { text-align: center; padding: 0 1rem; }
+    .flow-dot { width: 56px; height: 56px; border-radius: 50%; background: var(--dark3); border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 1.4rem; position: relative; z-index: 1; }
+    .flow-step h4 { font-size: 0.88rem; color: var(--white); margin-bottom: 0.4rem; }
+    .flow-step p { font-size: 0.78rem; color: #6B7280; }
+    .flow-time { font-size: 0.7rem; color: var(--gold); font-weight: 700; margin-top: 0.4rem; }
+
+    #sec-cta { background: var(--dark); padding: 6rem 2rem; }
+    .cta-card { background: linear-gradient(135deg, #1A1A1A 0%, #222 100%); border: 1px solid rgba(201,168,76,0.2); border-radius: 24px; padding: 4rem; text-align: center; position: relative; overflow: hidden; }
+    .cta-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(201,168,76,0.1) 0%, transparent 70%); }
+    .cta-card h2 { color: var(--white); position: relative; z-index: 1; }
+    .cta-card p { color: #9CA3AF; font-size: 1.05rem; margin-top: 0.75rem; position: relative; z-index: 1; }
+    .contact-card { display: inline-flex; align-items: center; gap: 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 1.5rem 2.5rem; margin-top: 2.5rem; position: relative; z-index: 1; }
+    .contact-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--gold) 0%, #E8A84C 100%); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; color: var(--dark); flex-shrink: 0; }
+    .contact-info { text-align: left; }
+    .contact-info .name { font-size: 1rem; font-weight: 700; color: var(--white); }
+    .contact-info .role { font-size: 0.8rem; color: #9CA3AF; margin-top: 0.1rem; }
+    .contact-info .email { font-size: 0.82rem; color: var(--gold); margin-top: 0.4rem; }
+    .cta-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 1.75rem; position: relative; z-index: 1; flex-wrap: wrap; }
+
+    .banner { background: linear-gradient(90deg, rgba(201,168,76,0.12) 0%, rgba(201,168,76,0.04) 100%); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius); padding: 1.5rem 2rem; display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .banner-icon { font-size: 2rem; }
+    .banner-text { flex: 1; min-width: 220px; }
+    .banner-text h4 { color: #111; margin-bottom: 0.25rem; }
+    .banner-text p { font-size: 0.85rem; color: #555; }
+
+    footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.06); padding: 2rem; text-align: center; }
+    footer p { font-size: 0.78rem; color: #6B7280; }
+    footer strong { color: #9CA3AF; }
+
+    .mt-3 { margin-top: 1.5rem; }
+    .mt-4 { margin-top: 2rem; }
+    .text-gold { color: var(--gold); }
+    .font-bold { font-weight: 700; }
+    .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+    @media (max-width: 768px) {
+      .section, #sec-hero, #sec-cta { padding-left: 1rem; padding-right: 1rem; }
+      .hero-grid, .grid-2, .calc-grid { grid-template-columns: 1fr; }
+      .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .flow { grid-template-columns: 1fr 1fr; row-gap: 2rem; }
+      .flow::before { display: none; }
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .cta-card { padding: 2.5rem 1.25rem; }
+      .contact-card { padding: 1.25rem; }
+      .compare-table, .price-table { min-width: 560px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav>
+  <div class="nav-brand">
+    <span class="jeeves-logo">Jeeves</span>
+    <div class="nav-divider"></div>
+    <span class="nav-client">SEENKA</span>
+  </div>
+  <div class="nav-links">
+    <a href="#sec-tarjetas">Tarjetas</a>
+    <a href="#sec-rieles">Cobros locales</a>
+    <a href="#sec-condiciones">Condiciones</a>
+    <a href="#sec-calc">Calculadora</a>
+  </div>
+  <a href="#sec-cta" class="nav-cta">Dar el alta →</a>
+</nav>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="sec-hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-label">Jeeves × Seenka · Propuesta · Octubre 2026</div>
+        <h1 class="hero-title">
+          Pagá en cada mercado.<br>
+          <em>Cobrá en moneda local.</em>
+        </h1>
+        <p class="hero-subtitle">
+          Tarjetas corporativas Visa a nombre de Seenka Inc., aceptadas en Colombia, México, Perú, Brasil y cualquier país donde se acepte Visa — sin abrir sociedades locales. Y rieles locales para que tus clientes de México, Colombia, Brasil y Argentina te paguen en su moneda mientras vos recibís USD en Jeeves.
+        </p>
+        <div class="hero-cta-group">
+          <a href="#sec-condiciones" class="btn-primary">Ver condiciones →</a>
+          <a href="#sec-cta" class="btn-ghost">Contactar a María ↓</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="num">USD 0</div>
+            <div class="lbl">Apertura y uso de plataforma</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">2%</div>
+            <div class="lbl">Cashback · primeros 3 meses</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">∞</div>
+            <div class="lbl">Tarjetas virtuales sin costo</div>
+          </div>
+          <div class="hero-stat">
+            <div class="num">4</div>
+            <div class="lbl">Rieles locales en LATAM</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="jcard">
+          <div class="jcard-top">
+            <span class="jcard-logo">Jeeves</span>
+            <span class="jcard-elite">Corporate</span>
+          </div>
+          <div class="jcard-mid">
+            <div class="jcard-chip"></div>
+            <span class="jcard-wave">〣</span>
+          </div>
+          <div class="jcard-number">4•••&nbsp; •••• &nbsp;•••• &nbsp;2026</div>
+          <div class="jcard-bottom">
+            <div class="jcard-holder">
+              <div class="lbl">Titular</div>
+              <div class="val">Seenka Inc.</div>
+            </div>
+            <div class="jcard-exp">
+              <div class="lbl">Etiqueta</div>
+              <div class="val">CO · Señales</div>
+            </div>
+            <div class="jcard-visa">VISA</div>
+          </div>
+        </div>
+        <p class="jcard-caption">Tarjeta corporativa <strong>Visa · BIN USA</strong> · a nombre de Seenka Inc. · personalizable por país, proveedor o proyecto</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ① LO QUE CONVERSAMOS ═══════════ -->
+<section id="sec-contexto" class="section" style="background:#F3F4F6;">
+  <div class="container">
+    <div class="sec-header">
+      <div class="section-badge light">① Lo que conversamos</div>
+      <h2>Seenka crece en nuevos mercados.<br><em>Los pagos tienen que acompañar.</em></h2>
+      <p>Seenka captura y audita medios para agencias y anunciantes en Argentina, Estados Unidos, Colombia, México, Perú y Brasil. Para capturar señales en cada país (por ejemplo, un servicio de streaming en Colombia) necesitan medios de pago aceptados localmente, sin abrir una sociedad en cada mercado.</p>
+    </div>
+    <div class="grid-3">
+      <div class="feat-card-light">
+        <div class="feat-icon">💳</div>
+        <h4>Pagos con tarjeta en cada país</h4>
+        <p>Hoy las tarjetas de Mercury salen a nombre de una persona y se reasignan a los equipos de data, producto y comercial. El gasto del último mes fue de ~USD 13.000, con ~USD 2.000 extra previstos por nuevos mercados y productos.</p>
+      </div>
+      <div class="feat-card-light">
+        <div class="feat-icon">💱</div>
+        <h4>Cobros a clientes en moneda local</h4>
+        <p>Clientes de México quieren pagar en pesos mexicanos, pero hoy Seenka Inc. solo puede cobrarles vía Stripe con tarjeta en USD o transferencia en USD.</p>
+      </div>
+      <div class="feat-card-light">
+        <div class="feat-icon">🏢</div>
+        <h4>Onboarding de la entidad de EE. UU.</h4>
+        <p>Arrancamos con Seenka Inc. (Estados Unidos), que fondea la operación en México, Colombia y el resto de LATAM. La sociedad argentina puede sumarse más adelante, sin trámites adicionales.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ② TARJETAS ═══════════ -->
+<section id="sec-tarjetas" class="section dark">
+  <div class="container">
+    <div class="sec-header">
+      <div class="section-badge">② Tarjetas corporativas Visa</div>
+      <h2>Una tarjeta de EE. UU.<br><em>que funciona en todos tus mercados.</em></h2>
+      <p>Las tarjetas Jeeves están respaldadas por Visa, con BIN en Estados Unidos, y se emiten a nombre de Seenka Inc. — no a nombre de Jeeves ni de una persona. Se aceptan en cualquier comercio de cualquier país que trabaje con Visa.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="feat-card" style="border-color: rgba(201,168,76,0.35);">
+        <div class="feat-icon">🌎</div>
+        <h4>Aceptadas donde se acepte Visa</h4>
+        <p>Colombia, México, Perú, Brasil o cualquier otro país: si el comercio trabaja con Visa, la tarjeta pasa. El consumo se debita en <strong style="color:#E5E7EB;">USD o en la moneda local del comercio</strong> — igual que cuando viajás, el comercio ofrece pagar en moneda local y la conversión la hace Visa. En la plataforma ves el tipo de cambio aplicado en cada consumo.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">♾️</div>
+        <h4>Virtuales ilimitadas, sin costo</h4>
+        <p>Creá todas las tarjetas virtuales que necesites, sin costo, a nombre de la empresa y compatibles con <strong style="color:#E5E7EB;">Apple Pay y Google Pay</strong>. Nombralas como quieras: "Colombia · proveedor X", "Brasil · señal Y", "Producto · SaaS".</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔁</div>
+        <h4>Pagos recurrentes sobre saldo prefondeado</h4>
+        <p>Jeeves funciona como una cuenta prefondeada: las tarjetas debitan del saldo de la cuenta, y podés dejar suscripciones y pagos recurrentes configurados. Si más adelante necesitan una línea de crédito, se puede solicitar con documentación y la evalúa el equipo de Riesgo.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🤖</div>
+        <h4>Conciliación por WhatsApp con IA</h4>
+        <p>Cada persona del equipo tiene su tarjeta y su rol (sin acceso al saldo de la empresa si no corresponde). Cuando paga, recibe un WhatsApp pidiendo la foto del comprobante: a fin de mes, todo queda conciliado.</p>
+      </div>
+    </div>
+
+    <!-- Live purchase demo -->
+    <div class="mt-4" style="background: #0A0A0A; border-radius: 20px; padding: 2rem; border: 1px solid #222;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <span style="font-size: 0.7rem; color: #6B7280; text-transform: uppercase; letter-spacing: 0.1em;">Compra aprobada · Ejemplo</span>
+        <span style="font-size: 0.7rem; color: #34D399; font-weight: 700;">● CONFIRMADA</span>
+      </div>
+      <div style="font-size: 2.3rem; font-weight: 900; color: white; letter-spacing: -0.04em;">COP 49.900<span style="color: var(--gold); font-size: 1rem; font-weight: 700; margin-left: 0.5rem;">Streaming · Colombia</span></div>
+      <div style="font-size: 0.82rem; color: #6B7280; margin-top: 0.3rem;">Tarjeta virtual "CO · Señales" · Titular: Seenka Inc. · Debitado en USD al tipo de cambio Visa</div>
+      <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem; flex-wrap: wrap;">
+        <span style="font-size: 0.78rem; background: rgba(52,211,153,0.1); color: #34D399; border: 1px solid rgba(52,211,153,0.2); padding: 0.4rem 0.9rem; border-radius: 999px;">✓ Visa · BIN USA</span>
+        <span style="font-size: 0.78rem; background: rgba(52,211,153,0.1); color: #34D399; border: 1px solid rgba(52,211,153,0.2); padding: 0.4rem 0.9rem; border-radius: 999px;">✓ Pago recurrente activo</span>
+        <span style="font-size: 0.78rem; background: rgba(201,168,76,0.1); color: var(--gold); border: 1px solid rgba(201,168,76,0.2); padding: 0.4rem 0.9rem; border-radius: 999px;">🎁 2% cashback · primeros 3 meses</span>
+        <span style="font-size: 0.78rem; background: rgba(99,102,241,0.1); color: #818CF8; border: 1px solid rgba(99,102,241,0.2); padding: 0.4rem 0.9rem; border-radius: 999px;">📸 Comprobante pedido por WhatsApp</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ③ RIELES LOCALES ═══════════ -->
+<section id="sec-rieles" class="section" style="background: var(--dark2); color: var(--white);">
+  <div class="container">
+    <div class="sec-header">
+      <div class="section-badge">③ Cobros con rieles locales</div>
+      <h2>Tus clientes pagan en su moneda.<br><em>Vos recibís USD en Jeeves.</em></h2>
+      <p style="color:#9CA3AF;">Con Jeeves, Seenka Inc. puede darle a cada cliente un riel local para que le pague en su moneda, con los medios que ya usa en su país. Los fondos llegan a la cuenta Jeeves en USD — sin depender de Stripe ni pedirle al cliente que pague en dólares.</p>
+    </div>
+
+    <div class="grid-4">
+      <div class="rail-card">
+        <div class="flag">🇲🇽</div>
+        <h4>México</h4>
+        <div class="cur">MXN → USD</div>
+        <p>Tus clientes mexicanos pagan en pesos mexicanos.</p>
+      </div>
+      <div class="rail-card">
+        <div class="flag">🇨🇴</div>
+        <h4>Colombia</h4>
+        <div class="cur">COP → USD</div>
+        <p>Cobros en pesos colombianos por riel local.</p>
+      </div>
+      <div class="rail-card">
+        <div class="flag">🇧🇷</div>
+        <h4>Brasil</h4>
+        <div class="cur">BRL → USD</div>
+        <p>Cobros en reales vía PIX.</p>
+      </div>
+      <div class="rail-card">
+        <div class="flag">🇦🇷</div>
+        <h4>Argentina</h4>
+        <div class="cur">ARS → USD</div>
+        <p>Cobros en pesos argentinos por riel local.</p>
+      </div>
+    </div>
+
+    <p class="mt-3" style="font-size:0.85rem; color:#9CA3AF;">Para el resto de las jurisdicciones (incluido Perú), los cobros y pagos internacionales se hacen por SWIFT, sin restricciones de país.</p>
+
+    <!-- Hoy vs Jeeves -->
+    <div class="mt-4 table-scroll">
+      <h3 style="color: var(--white);">Cómo opera Seenka hoy vs. con Jeeves</h3>
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Necesidad</th>
+            <th>Hoy</th>
+            <th class="col-jeeves">Con Jeeves</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Titular de las tarjetas</td>
+            <td>A nombre de una persona, reasignadas a cada equipo</td>
+            <td class="col-jeeves"><span class="check">✓</span> A nombre de Seenka Inc., una por persona, país o proveedor</td>
+          </tr>
+          <tr>
+            <td>Pagos en Colombia, México, Perú, Brasil</td>
+            <td>Limitado sin tarjetas aceptadas localmente</td>
+            <td class="col-jeeves"><span class="check">✓</span> Visa con BIN USA, aceptada en cualquier comercio Visa</td>
+          </tr>
+          <tr>
+            <td>Cobros a clientes en México</td>
+            <td>Solo en USD vía Stripe (tarjeta o transferencia)</td>
+            <td class="col-jeeves"><span class="check">✓</span> El cliente paga en MXN, Seenka recibe USD</td>
+          </tr>
+          <tr>
+            <td>Conciliación de gastos</td>
+            <td>Manual, a fin de mes</td>
+            <td class="col-jeeves"><span class="check">✓</span> Comprobantes por WhatsApp + IA</td>
+          </tr>
+          <tr>
+            <td>Cashback</td>
+            <td><span class="cross">✗</span></td>
+            <td class="col-jeeves text-gold font-bold">2% · primeros 3 meses</td>
+          </tr>
+          <tr>
+            <td>Costo de apertura y plataforma</td>
+            <td>—</td>
+            <td class="col-jeeves text-gold font-bold">USD 0 · bonificado · sin mantenimiento mensual</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ④ CONDICIONES ═══════════ -->
+<section id="sec-condiciones" class="section">
+  <div class="container">
+    <div class="sec-header">
+      <div class="section-badge light">④ Condiciones · Alta en octubre 2026</div>
+      <h2>Costos y bonificaciones<br><em>para Seenka.</em></h2>
+      <p>Si Seenka Inc. inicia y completa el onboarding y hace su primer pago con tarjeta en octubre de 2026, aplican estas condiciones.</p>
+    </div>
+
+    <div class="table-scroll">
+      <table class="price-table">
+        <thead>
+          <tr>
+            <th>Concepto</th>
+            <th>Precio de lista</th>
+            <th>Para Seenka</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Apertura y uso de la plataforma</strong></td>
+            <td class="strike">USD 3.500</td>
+            <td class="free">USD 0 · bonificado</td>
+          </tr>
+          <tr>
+            <td><strong>Opening fee</strong></td>
+            <td class="strike">USD 250</td>
+            <td class="free">USD 0 · bonificado</td>
+          </tr>
+          <tr>
+            <td><strong>Mantenimiento mensual de la cuenta</strong></td>
+            <td>—</td>
+            <td class="free">Sin mantenimiento mensual</td>
+          </tr>
+          <tr>
+            <td><strong>Tarjetas virtuales Visa</strong><br><span class="note">A nombre de la empresa · Apple Pay y Google Pay</span></td>
+            <td>—</td>
+            <td class="free">Ilimitadas, sin costo</td>
+          </tr>
+          <tr>
+            <td><strong>Cashback en tarjetas</strong><br><span class="note">Sobre todo el gasto con tarjeta</span></td>
+            <td>—</td>
+            <td class="free">2% · primeros 3 meses</td>
+          </tr>
+          <tr>
+            <td><strong>Rieles locales</strong><br><span class="note">Argentina, México, Colombia y Brasil</span></td>
+            <td>—</td>
+            <td class="free">Incluidos · recibís USD</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 banner">
+      <div class="banner-icon">🎁</div>
+      <div class="banner-text">
+        <h4>Condición del cashback</h4>
+        <p>El 2% de cashback aplica durante los primeros tres meses de uso, siempre que el gasto con tarjetas Jeeves supere los <strong>USD 1.000 por mes</strong>. Con el volumen actual de Seenka (~USD 13.000–15.000/mes) la condición se cumple con holgura.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ⑤ CALCULADORA ═══════════ -->
+<section id="sec-calc" class="section" style="background: #F3F4F6;">
+  <div class="container">
+    <div class="sec-header center">
+      <div class="section-badge light">⑤ Calculadora de beneficios</div>
+      <h2>Cuánto suma<br><em>el primer año.</em></h2>
+      <p>Ingresá el gasto mensual con tarjeta y mirá el beneficio estimado al instante.</p>
+    </div>
+
+    <div class="calc-wrapper">
+      <div class="calc-header">
+        <h3>💰 Beneficios · Seenka × Jeeves</h3>
+        <span class="badge">Celdas en dorado = editables</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-grid">
+          <div>
+            <div class="calc-section-title">💳 Gasto con tarjetas</div>
+            <div class="calc-field">
+              <label for="gasto_tarjeta">Gasto mensual con tarjetas</label>
+              <div class="calc-input-wrap has-prefix has-suffix">
+                <span class="prefix">$</span>
+                <input type="number" id="gasto_tarjeta" value="15000" step="500" min="0" class="editable" oninput="calcular()">
+                <span class="suffix">USD/mes</span>
+              </div>
+              <div class="hint">Hoy ~USD 13.000 + ~USD 2.000 por nuevos mercados y productos.</div>
+            </div>
+
+            <div style="background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; padding: 1rem 1.25rem;">
+              <p style="font-size: 0.8rem; color: #374151;"><strong>Con Jeeves:</strong> apertura y uso de plataforma bonificados (USD 3.500), opening fee bonificado (USD 250), sin mantenimiento mensual y <strong>2% de cashback</strong> los primeros 3 meses con gasto mayor a USD 1.000/mes.</p>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem;">
+              <span style="font-size: 0.72rem; font-weight: 700; background: #FDF3D7; color: #8A6D2B; padding: 0.3rem 0.7rem; border-radius: 999px;">✦ Plataforma USD 0</span>
+              <span style="font-size: 0.72rem; font-weight: 700; background: #FDF3D7; color: #8A6D2B; padding: 0.3rem 0.7rem; border-radius: 999px;">✦ Opening fee USD 0</span>
+              <span style="font-size: 0.72rem; font-weight: 600; background: #F3F4F6; color: #374151; padding: 0.3rem 0.7rem; border-radius: 999px;">✓ Virtuales ilimitadas sin costo</span>
+              <span style="font-size: 0.72rem; font-weight: 600; background: #FDF3D7; color: #8A6D2B; padding: 0.3rem 0.7rem; border-radius: 999px;">🎁 2% cashback · 3 meses</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="calc-section-title">✅ Beneficio estimado · Año 1</div>
+            <div class="calc-results">
+              <h4>Seenka con Jeeves</h4>
+              <div class="result-row">
+                <span class="result-label">🎁 Cashback 2% (3 meses)</span>
+                <span class="result-value" id="r_cashback" style="color: #34D399;">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">⚡ Apertura y uso de plataforma bonificados</span>
+                <span class="result-value" style="color: #34D399;">USD 3.500</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">🔓 Opening fee bonificado</span>
+                <span class="result-value" style="color: #34D399;">USD 250</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">📅 Mantenimiento mensual</span>
+                <span class="result-value" style="color: #9CA3AF;">USD 0</span>
+              </div>
+              <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 1rem 0;"></div>
+              <div class="result-row highlight">
+                <span class="result-label">🏆 Beneficio total año 1</span>
+                <span class="result-value" id="r_total">—</span>
+              </div>
+            </div>
+            <p id="r_aviso" style="font-size: 0.78rem; color: #B45309; margin-top: 0.75rem; display: none;">Con menos de USD 1.000/mes en tarjetas no aplica el cashback.</p>
+            <div style="margin-top: 1.25rem; background: #F9F9F7; border: 1px solid #E5E7EB; border-radius: 12px; padding: 1.25rem;">
+              <p style="font-size: 0.75rem; color: #6B7280;">* Cálculo estimado. El cashback del 2% aplica sobre el gasto con tarjetas durante los primeros 3 meses, siempre que el gasto supere USD 1.000 por mes. Condiciones válidas para cuentas que inicien y completen el onboarding y realicen su primer pago en octubre de 2026. Las conversiones de moneda en consumos en el exterior las realiza Visa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ⑥ PRÓXIMOS PASOS ═══════════ -->
+<section class="section dark">
+  <div class="container">
+    <div class="sec-header center">
+      <div class="section-badge">⑥ Próximos pasos</div>
+      <h2>Del alta a la primera compra,<br><em>dentro de octubre.</em></h2>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-dot">📋</div>
+        <h4>Revisión de la propuesta</h4>
+        <p>Seenka la analiza con su equipo</p>
+        <div class="flow-time">Esta semana</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot">🔗</div>
+        <h4>Link de onboarding</h4>
+        <p>Te envío el link y la documentación; si se complica, cargo la información por vos (salvo T&amp;C y creación de usuario)</p>
+        <div class="flow-time">Al confirmar</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot">🏦</div>
+        <h4>Cuenta activa</h4>
+        <p>Cuenta de Seenka Inc. aprobada y fondeada</p>
+        <div class="flow-time">~5 días hábiles</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot">💳</div>
+        <h4>Primer pago</h4>
+        <p>Primeras tarjetas virtuales y primer consumo para activar las condiciones</p>
+        <div class="flow-time">Octubre 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CTA ═══════════ -->
+<section id="sec-cta">
+  <div class="container">
+    <div class="cta-card">
+      <div class="section-badge" style="background: rgba(201,168,76,0.15); border-color: rgba(201,168,76,0.3);">¿Listos para dar el alta?</div>
+      <h2>Sigamos avanzando.</h2>
+      <p>Cuando lo validen con el equipo, avisame y te envío el link de onboarding de Seenka Inc. Te acompaño en todo el proceso para que puedan hacer el primer pago en octubre y aprovechar las condiciones.</p>
+
+      <div class="contact-card">
+        <div class="contact-avatar">MS</div>
+        <div class="contact-info">
+          <div class="name">María Sabatella Sanguinetti</div>
+          <div class="role">Jeeves · Latinoamérica</div>
+          <div class="email">maria.sanguinetti@tryjeeves.com</div>
+        </div>
+      </div>
+
+      <div class="cta-buttons">
+        <a href="mailto:maria.sanguinetti@tryjeeves.com?subject=Seenka%20%C3%97%20Jeeves%20%C2%B7%20Alta&body=Hola%20Mar%C3%ADa%2C%20revisamos%20la%20propuesta%20y%20queremos%20avanzar%20con%20el%20alta%20de%20Seenka%20Inc.%20en%20Jeeves.%20%C2%BFNos%20env%C3%ADas%20el%20link%20de%20onboarding%3F"
+           class="btn-primary">✓ Quiero dar el alta</a>
+      </div>
+      <p style="font-size: 0.75rem; color: #6B7280; margin-top: 1rem; position: relative; z-index: 1;">Se abrirá tu cliente de correo con un mensaje listo para María · maria.sanguinetti@tryjeeves.com</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <strong>Jeeves</strong> · tryjeeves.com · Propuesta Tarjetas Corporativas + Rieles Locales · Seenka Inc. · Octubre 2026<br>
+    <span style="margin-top: 0.3rem; display: inline-block;">Elaborado por María Sabatella Sanguinetti · Jeeves</span>
+  </p>
+</footer>
+
+<script>
+  function fmtUSD(n) {
+    return 'USD ' + new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 }).format(Math.round(n));
+  }
+  function calcular() {
+    const gasto = Math.max(0, parseFloat(document.getElementById('gasto_tarjeta').value) || 0);
+    const CASHBACK_PCT = 0.02, MESES = 3, MIN_MENSUAL = 1000;
+    const PLATAFORMA = 3500, OPENING = 250;
+    const aplica = gasto > MIN_MENSUAL;
+    const cashback = aplica ? gasto * MESES * CASHBACK_PCT : 0;
+    document.getElementById('r_cashback').textContent = fmtUSD(cashback);
+    document.getElementById('r_total').textContent = fmtUSD(cashback + PLATAFORMA + OPENING);
+    document.getElementById('r_aviso').style.display = aplica ? 'none' : 'block';
+  }
+  calcular();
+</script>
+
+</body>
+</html>
